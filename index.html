@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Student Management System frontend demo using HTML, CSS, and JavaScript">
+    <title>Smart Student Management System - Frontend Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="ssms-demo-root" class="demo-app">
+        <div id="demoNotification" class="demo-notification demo-hidden"></div>
+
+        <section id="authView" class="demo-auth-wrap">
+            <div class="demo-card demo-auth-card">
+                <p class="demo-tag">Phase 1 Frontend Demo</p>
+                <h1>Smart Student Management System</h1>
+                <p class="demo-subtitle">Login to explore dashboard, student list, attendance, marks, and report modules.</p>
+
+                <form id="loginForm" class="demo-form" autocomplete="off">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text" required placeholder="Enter username">
+
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" required placeholder="Enter password">
+
+                    <button type="submit" class="demo-btn demo-btn-primary">Login</button>
+                </form>
+
+                <p id="loginMessage" class="demo-message"></p>
+            </div>
+        </section>
+
+        <section id="appView" class="demo-hidden">
+            <header class="demo-topbar">
+                <div>
+                    <h2>Smart Student Management System</h2>
+                    <p class="demo-subtitle">Frontend Demo (localStorage based)</p>
+                    <p class="demo-role-badge">Logged in as: <strong id="activeRoleBadge">Viewer</strong></p>
+                </div>
+                <button id="logoutBtn" class="demo-btn demo-btn-secondary">Logout</button>
+            </header>
+
+            <nav class="demo-nav">
+                <button class="demo-nav-link demo-active" data-page="dashboard">Dashboard</button>
+                <button class="demo-nav-link" data-page="students">Students</button>
+                <button class="demo-nav-link" data-page="subjects">Subjects</button>
+                <button class="demo-nav-link" data-page="attendance">Attendance</button>
+                <button class="demo-nav-link" data-page="marks">Marks</button>
+                <button class="demo-nav-link" data-page="report">Report</button>
+                <button class="demo-nav-link" data-page="tools" data-admin-only="true">Tools</button>
+            </nav>
+
+            <main class="demo-container">
+                <section class="demo-page" data-page-content="dashboard">
+                    <h3>Dashboard</h3>
+                    <div class="demo-stat-grid">
+                        <article class="demo-card">
+                            <p>Total Students</p>
+                            <h4 id="totalStudentsCard">0</h4>
+                        </article>
+                        <article class="demo-card">
+                            <p>Total Subjects</p>
+                            <h4 id="totalSubjectsCard">0</h4>
+                        </article>
+                        <article class="demo-card">
+                            <p>Attendance Entries</p>
+                            <h4 id="totalAttendanceCard">0</h4>
+                        </article>
+                        <article class="demo-card">
+                            <p>Marks Entries</p>
+                            <h4 id="totalMarksCard">0</h4>
+                        </article>
+                        <article class="demo-card">
+                            <p>Average Score</p>
+                            <h4 id="averageScoreCard">0%</h4>
+                        </article>
+                        <article class="demo-card">
+                            <p>Pass Rate</p>
+                            <h4 id="passRateCard">0%</h4>
+                        </article>
+                    </div>
+                    <div class="demo-card">
+                        <h4>Quick Note</h4>
+                        <p>This demo stores all values in your browser using localStorage. You can refresh and still keep data.</p>
+                        <button id="resetDemoDataBtn" class="demo-btn demo-btn-danger" data-admin-only="true">Reset Demo Data</button>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="students">
+                    <h3>Student Management</h3>
+                    <form id="studentForm" class="demo-card demo-form-grid" data-admin-only="true">
+                        <input id="studentEditId" type="hidden">
+                        <div>
+                            <label for="studentRollNo">Roll No</label>
+                            <input id="studentRollNo" type="text" placeholder="e.g. CSE201" required>
+                        </div>
+                        <div>
+                            <label for="studentName">Student Name</label>
+                            <input id="studentName" type="text" placeholder="Enter full name" required>
+                        </div>
+                        <div>
+                            <label for="studentCourse">Course</label>
+                            <input id="studentCourse" type="text" placeholder="e.g. BSc Computer Science" required>
+                        </div>
+                        <div>
+                            <label for="studentSemester">Semester</label>
+                            <input id="studentSemester" type="text" placeholder="e.g. Semester 2" required>
+                        </div>
+                        <div class="demo-full-width demo-inline-actions">
+                            <button type="submit" id="saveStudentBtn" class="demo-btn demo-btn-primary">Add Student</button>
+                            <button type="button" id="cancelEditStudentBtn" class="demo-btn demo-btn-secondary demo-hidden">Cancel Edit</button>
+                        </div>
+                    </form>
+
+                    <div class="demo-card demo-table-wrap">
+                        <div class="demo-search-row">
+                            <input id="studentSearchInput" type="text" placeholder="Search by roll no, name, course, semester">
+                            <button id="clearStudentSearchBtn" type="button" class="demo-btn demo-btn-secondary demo-btn-mini">Clear</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Course</th>
+                                    <th>Semester</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="subjects">
+                    <h3>Subject Management</h3>
+                    <form id="subjectForm" class="demo-card demo-form-grid" data-admin-only="true">
+                        <input id="subjectEditId" type="hidden">
+                        <div>
+                            <label for="subjectCode">Subject Code</label>
+                            <input id="subjectCode" type="text" placeholder="e.g. CS201" required>
+                        </div>
+                        <div>
+                            <label for="subjectName">Subject Name</label>
+                            <input id="subjectName" type="text" placeholder="e.g. Data Structures" required>
+                        </div>
+                        <div class="demo-full-width demo-inline-actions">
+                            <button type="submit" id="saveSubjectBtn" class="demo-btn demo-btn-primary">Add Subject</button>
+                            <button type="button" id="cancelEditSubjectBtn" class="demo-btn demo-btn-secondary demo-hidden">Cancel Edit</button>
+                        </div>
+                    </form>
+
+                    <div class="demo-card demo-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="attendance">
+                    <h3>Attendance Management</h3>
+                    <form id="attendanceForm" class="demo-card demo-form-grid" data-admin-only="true">
+                        <div>
+                            <label for="attendanceStudent">Student</label>
+                            <select id="attendanceStudent" required></select>
+                        </div>
+                        <div>
+                            <label for="attendanceSubject">Subject</label>
+                            <select id="attendanceSubject" required></select>
+                        </div>
+                        <div>
+                            <label for="attendanceDate">Date</label>
+                            <input id="attendanceDate" type="date" required>
+                        </div>
+                        <div>
+                            <label for="attendanceStatus">Status</label>
+                            <select id="attendanceStatus" required>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="demo-full-width">
+                            <button type="submit" class="demo-btn demo-btn-primary">Save Attendance</button>
+                        </div>
+                    </form>
+
+                    <div class="demo-card demo-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Roll No</th>
+                                    <th>Student</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="marks">
+                    <h3>Marks Management</h3>
+                    <form id="marksForm" class="demo-card demo-form-grid" data-admin-only="true">
+                        <div>
+                            <label for="marksStudent">Student</label>
+                            <select id="marksStudent" required></select>
+                        </div>
+                        <div>
+                            <label for="marksSubject">Subject</label>
+                            <select id="marksSubject" required></select>
+                        </div>
+                        <div>
+                            <label for="examType">Exam Type</label>
+                            <input id="examType" type="text" value="Internal-1" required>
+                        </div>
+                        <div>
+                            <label for="marksObtained">Marks Obtained</label>
+                            <input id="marksObtained" type="number" min="0" step="0.01" required>
+                        </div>
+                        <div>
+                            <label for="maxMarks">Max Marks</label>
+                            <input id="maxMarks" type="number" min="1" step="0.01" value="100" required>
+                        </div>
+                        <div>
+                            <label for="marksGradePreview">Grade Preview</label>
+                            <input id="marksGradePreview" type="text" value="-" readonly>
+                        </div>
+                        <div class="demo-full-width">
+                            <button type="submit" class="demo-btn demo-btn-primary">Save Marks</button>
+                        </div>
+                    </form>
+
+                    <div class="demo-card demo-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student</th>
+                                    <th>Subject</th>
+                                    <th>Exam</th>
+                                    <th>Score</th>
+                                    <th>Grade</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marksTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="report">
+                    <h3>Student Report</h3>
+                    <div class="demo-card demo-form-grid">
+                        <div>
+                            <label for="reportStudent">Select Student</label>
+                            <select id="reportStudent" required></select>
+                        </div>
+                        <div class="demo-full-width">
+                            <div class="demo-inline-actions">
+                                <button id="generateReportBtn" class="demo-btn demo-btn-primary" type="button" data-admin-only="true">Generate Report</button>
+                                <button id="printReportBtn" class="demo-btn demo-btn-secondary" type="button" data-admin-only="true">Print</button>
+                                <button id="exportReportCsvBtn" class="demo-btn demo-btn-secondary" type="button" data-admin-only="true">Export CSV</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reportOutput" class="demo-card">
+                        <p>Select a student and click Generate Report.</p>
+                    </div>
+                </section>
+
+                <section class="demo-page demo-hidden" data-page-content="tools" data-admin-only="true">
+                    <h3>Tools and Backup</h3>
+                    <div class="demo-card demo-tools-grid">
+                        <div>
+                            <h4>Export Data</h4>
+                            <p>Download all students, attendance, marks, and subjects in JSON format.</p>
+                            <button id="exportDataBtn" class="demo-btn demo-btn-primary" type="button">Export JSON</button>
+                        </div>
+                        <div>
+                            <h4>Import Data</h4>
+                            <p>Upload a previously exported JSON file.</p>
+                            <input id="importDataInput" type="file" accept="application/json">
+                            <button id="importDataBtn" class="demo-btn demo-btn-secondary" type="button">Import JSON</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
